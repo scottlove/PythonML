@@ -3,6 +3,9 @@ import gensim.corpora as co
 import gensim.models as mo
 import gensim.similarities as si
 
+
+
+
 def getDictionary(DictFilename):
     return co.Dictionary.load(DictFilename)
 
