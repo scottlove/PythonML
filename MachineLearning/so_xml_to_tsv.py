@@ -17,7 +17,9 @@ from collections import defaultdict
 
 from data import DATA_DIR
 
-filename = os.path.join(DATA_DIR, "posts-2011-12.xml")
+
+#filename = os.path.join(DATA_DIR, "posts-2011-12.xml")
+filename = os.path.join(DATA_DIR, "stackoverflow.com-Posts")
 filename_filtered = os.path.join(DATA_DIR, "filtered.tsv")
 
 q_creation = {}  # creation datetimes of questions
@@ -71,81 +73,122 @@ num_questions = 0
 num_answers = 0
 
 
+def print_file(filename):
+    with open(os.path.join(DATA_DIR, filename), "r") as f:
+        with open(os.path.join(DATA_DIR, "sample.txt"), "w") as o:
+            for i in range(100):
+               o.write( f.readline())
+
+
+
+
+def testParse(filename):
+
+    it = etree.iterparse(os.path.join(DATA_DIR, filename), events=("start","end"))
+    root = it.next()
+    path= []
+    for event, elem in it:
+        if event == 'start':
+            path.append(elem.tag)
+        elif event == 'end':
+            if elem.tag == 'row':
+                 print elem.get('CreationDate')
+
+            # process the tag
+            if elem.tag == 'name':
+                if 'members' in path:
+                    print 'member'
+                else:
+                    print 'nonmember'
+            path.pop()
+
+
+
 def parsexml(filename):
     global num_questions, num_answers
 
     counter = 0
+    it = etree.iterparse(os.path.join(DATA_DIR, filename), events=("start","end"))
 
-    it = map(itemgetter(1),
-             iter(etree.iterparse(filename, events=('start',))))
-    root = next(it)  # get posts element
+    for event, elem in it:
+        if event == 'end':
+            if counter % 100000 == 0:
+                print(counter)
 
-    for elem in it:
-        if counter % 100000 == 0:
-            print(counter)
+            counter += 1
 
-        counter += 1
+            if elem.tag == 'row':
+                creation_date = dateparser.parse(elem.get('CreationDate'))
 
-        if elem.tag == 'row':
-            creation_date = dateparser.parse(elem.get('CreationDate'))
-
-            # import pdb;pdb.set_trace()
-            # if creation_date.year < 2011:
-            #    continue
-
-            Id = int(elem.get('Id'))
-            PostTypeId = int(elem.get('PostTypeId'))
-            Score = int(elem.get('Score'))
-
-            if PostTypeId == 1:
-                num_questions += 1
-                years[creation_date.year] += 1
-
-                ParentId = -1
-                TimeToAnswer = 0
-                q_creation[Id] = creation_date
-                accepted = elem.get('AcceptedAnswerId')
-                if accepted:
-                    q_accepted[Id] = int(accepted)
-                IsAccepted = 0
-
-            elif PostTypeId == 2:
-                num_answers += 1
-
-                ParentId = int(elem.get('ParentId'))
-                if not ParentId in q_creation:
-                    # question was too far in the past
+                # import pdb;pdb.set_trace()
+                if creation_date.year < 2013:
                     continue
 
-                TimeToAnswer = (creation_date - q_creation[ParentId]).seconds
+                Id = int(elem.get('Id'))
+                PostTypeId = int(elem.get('PostTypeId'))
+                Score = int(elem.get('Score'))
 
-                if ParentId in q_accepted:
-                    IsAccepted = int(q_accepted[ParentId] == Id)
-                else:
+                if PostTypeId == 1:
+                    num_questions += 1
+                    years[creation_date.year] += 1
+
+                    ParentId = -1
+                    TimeToAnswer = 0
+                    q_creation[Id] = creation_date
+                    accepted = elem.get('AcceptedAnswerId')
+                    if accepted:
+                        q_accepted[Id] = int(accepted)
                     IsAccepted = 0
 
-                meta[ParentId].append((Id, IsAccepted, TimeToAnswer, Score))
+                elif PostTypeId == 2:
+                    num_answers += 1
 
-            else:
-                continue
+                    ParentId = int(elem.get('ParentId'))
+                    if not ParentId in q_creation:
+                        # question was too far in the past
+                        continue
 
-            Text, NumTextTokens, NumCodeLines, LinkCount, NumImages = filter_html(
-                elem.get('Body'))
+                    TimeToAnswer = (creation_date - q_creation[ParentId]).seconds
 
-            values = (Id, ParentId,
-                      IsAccepted,
-                      TimeToAnswer, Score,
-                      Text,
-                      NumTextTokens, NumCodeLines, LinkCount, NumImages)
+                    if ParentId in q_accepted:
+                        IsAccepted = int(q_accepted[ParentId] == Id)
+                    else:
+                        IsAccepted = 0
 
-            yield values
+                    meta[ParentId].append((Id, IsAccepted, TimeToAnswer, Score))
 
-            root.clear()  # preserve memory
+                else:
+                    continue
 
+                Text, NumTextTokens, NumCodeLines, LinkCount, NumImages = filter_html(
+                    elem.get('Body'))
+
+                elem.clear()
+                values = (Id, ParentId,
+                          IsAccepted,
+                          TimeToAnswer, Score,
+                          Text.encode('utf-8'),
+                          NumTextTokens, NumCodeLines, LinkCount, NumImages)
+
+                yield values
+            elem.clear()
+
+
+
+count = 0;
+#print_file(filename)
+#testParse("sample.txt")
 with open(os.path.join(DATA_DIR, filename_filtered), "w") as f:
     for item in parsexml(filename):
-        line = "\t".join(map(str, item))
-        f.write(line.encode("utf-8") + "\n")
+        try:
+            line = "\t".join(map(str, item))
+            f.write(line.encode("utf-8") + "\n")
+            count = count + 1;
+        except:
+            print (item)
+        if ( count % 1000== 0):
+            print("finished %i" % count)
+
 
 with open(os.path.join(DATA_DIR, "filtered-meta.json"), "w") as f:
     json.dump(meta, f)
