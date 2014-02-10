@@ -1,8 +1,7 @@
-import sklearn.feature_extraction.text as sk
+
 import os
 import scipy as sp
 import sys
-import nltk.stem
 import StemmedCountVectorizer as sc
 
 

@@ -1,8 +1,8 @@
 import os
 
 # DATA_DIR = r"C:\pymlbook-data\ch05"
-DATA_DIR = r"C:/Dev/Data/stackoverflow.com-Posts"
-CHART_DIR = os.path.join("..", "charts")
+DATA_DIR = r"C:/Dev/Datasets/stackOverflow"
+CHART_DIR = os.path.join("../", "charts")
 
 filtered = os.path.join(DATA_DIR, "filtered.tsv")
 filtered_meta = os.path.join(DATA_DIR, "filtered-meta.json")
