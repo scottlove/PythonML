@@ -16,14 +16,17 @@ def plot_boston(x,y,slope,c=0):
 
 boston = load_boston()
 
-#convert to multiple dimensions first dimension is example, second is attributes
-#in this case there is only examples and attribute is number of rooms [n,1] shape
-x = boston.data[:,5]
 
-#adding the [v,1] is the bias
-x = np.array([[v,1] for v in x])
+x = boston.data
+
+#We still add a bias term, but now we must use np.concatenate
+#which concatenates two arrays/list because we
+#hae several input variables in v
+x = np.array([np.concatenate((v,[1])) for v in boston.data])
+
 y = boston.target
-(slope,bias),res,_,_ = np.linalg.lstsq(x,y)
+s,res,_,_ = np.linalg.lstsq(x,y)
+
 
 #This is the root mean squared error
 #most data is most 2 std from mean, double rmse to get
