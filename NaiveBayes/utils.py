@@ -18,7 +18,7 @@ import numpy as np
 
 
 
-DATA_DIR = "data"
+DATA_DIR = "Data"
 CHART_DIR = "charts"
 
 
@@ -73,7 +73,7 @@ def load_sanders_data(dirname=".", line_count=-1):
             try:
                 tweet = json.load(open(tweet_fn, "r"))
             except IOError:
-                print("Tweet '%s' not found. Skip."%tweet_fn)
+                #print("Tweet '%s' not found. Skip."%tweet_fn)
                 continue
 
 
@@ -106,6 +106,7 @@ def plot_pr(auc_score, name, phase, precision, recall, label=None):
     filename = name.replace(" ", "_")
     pylab.savefig(os.path.join(CHART_DIR, "pr_%s_%s.png" %
                   (filename, phase)), bbox_inches="tight")
+
 
 
 
