@@ -31,7 +31,13 @@ def learn_for(i,reviews):
 
     #Build an array with indices [0..N] except i
     us = np.delete(np.arange(reviews.shape[0]), i)
+    xx =reviews[us][:,ps].copy().toarray()
+
+    #x contains CSC array [movieID][UserID movie ratings]
+    #only those movies reviewed by user i
     x = reviews[us][:,ps].T
+
+    #ratings this user made for the movies they rated
     y = u.data
     err = 0
     eb = 0
@@ -40,11 +46,16 @@ def learn_for(i,reviews):
         xc,x1 = movie_norm(x[train])
         #subtract the mean review score from y[train] movie rating
         #so x and y are normalized to same value when fitting
+        #mean review scores for movies user rated vs what the user rated
         reg.fit(xc, y[train]-x1)
 
         #Now check the fit using the x[test] data
         xc,x1 = movie_norm(x[test])
-        p = np.array([reg.predict(xi) for xi in  xc]).ravel()
+
+        #P contains the predicted rating the user would have made
+        #using this model
+        p = np.array([reg.predict(xi) for xi in  xc])
+        #e is the difference between actual and predicted rating
         e = (p+x1)-y[test]
         err += np.sum(e*e)
         eb += np.sum( (y[train].mean() - y[test])**2 )
