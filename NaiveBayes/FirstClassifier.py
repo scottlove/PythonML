@@ -17,9 +17,11 @@ import Models
 #     3) to train a model for scenarion (such as identifying tweets with and without sentiment)
 #         a) adjust tweet labels to classes you interest in
 #             example: in sentiment case we are having two classes positive and negative tweets get 1, others 0
-#         b)create a pipeline to proccess the data.  A pipeline
-#           sequentially applies a list of transforms, estimator must be last item
-#             The pipeline we are using has a TfidfVectorizer followed by a MultinomialNB classifier.
+#         b)create a pipeline to process the data.  A pipeline
+#           sequentially applies a list of transforms, estimator must be last item.
+#             The pipeline we are using has a TfidfVectorizer estimator and LinguisticVectorizer followed by a
+#             MultinomialNB classifier. We use Feature union to run TfidfVectorizer and LinguisticVectorizer in
+#             parallel and combine outputs to feed to MulinomialNB Classifier
 #             TfidfVectorizer:
 #                 Converts a collection of raw documents to a matrix of TF-IDF features. This is done
 #                 internally by tokenizing the document and applying Term Frequency Inverse Document Frequency
@@ -90,7 +92,7 @@ def sentimentAndNoSentiment(X,Y):
     classes = np.unique(Y)
     for c in classes:
             print("#%s: %i" % (c, sum(Y==c)))
-    train_model(Models.get_best_model,X,Y,"sentimentVsNoSentiment",True)
+    train_model(Models.get_best_union_model,X,Y,"sentimentVsNoSentiment",True)
 
 def posVsRest(X,Y):
     #Y now contains 1 for tweets that were positive
