@@ -105,8 +105,8 @@ def findBestEstimator(X,Y):
     best_clf = gridSearchModel.grid_search_model(Models.create_ngram_model,X,Y)
 
 X,Y = u.load_sanders_data()
-#runJustPosandNeg(X,Y)
-sentimentAndNoSentiment(X,Y)
+runJustPosandNeg(X,Y)
+#sentimentAndNoSentiment(X,Y)
 #posVsRest(X,Y)
 
 #find best estimator for sentiment vs no sentiment
