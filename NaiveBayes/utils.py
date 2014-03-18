@@ -221,7 +221,9 @@ def plot_bias_variance(data_sizes, train_errors, test_errors, name):
 
 def load_sent_word_net():
 
-
+    #This algo just averages the pos and neg scores for all
+    #for all the synsets a word is in.  Does not try to figure out
+    #which catagory (noun, verb) the word is in.
     sent_scores = collections.defaultdict(list)
 
 

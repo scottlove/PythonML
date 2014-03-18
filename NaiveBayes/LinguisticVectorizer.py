@@ -10,6 +10,7 @@ import nltk
 
 #vectorizer that assigns sentiments based
 #on SentiWordNet. It assigns positive or negative to most words
+#inherites from base estimator
 class LinguisticVectorizer(BaseEstimator):
     def get_feature_names(self):
         return np.array(['sent_neut', 'sent_pos', 'sent_neg',
@@ -32,6 +33,7 @@ class LinguisticVectorizer(BaseEstimator):
         # http://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html
         #import pdb;pdb.set_trace()
         sent = tuple(nltk.word_tokenize(d))
+        #pos_tag tags tokens with part of speech (noun, verb etc)
         if poscache is not None:
             if d in poscache:
                 tagged = poscache[d]
