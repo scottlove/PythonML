@@ -16,11 +16,11 @@ def apriori_simple(counts,minsupport,dataset):
     allsets = [itemsets]
     newsets = []
     for j in range(16):
-        print "increment:"
-        print j
+        print ("increment:")
+        print (j)
         for i,ell in enumerate(itemsets):
-            print i
-            print ell
+            print (i)
+            print (ell)
             for v_ in valid:
                 if v_ not in ell:
                     newset = (ell|set([v_]))
@@ -30,7 +30,7 @@ def apriori_simple(counts,minsupport,dataset):
                             c_newset +=1
                     if c_newset > minsupport:
                         newsets.append(newset)
-                        print "added c_newset"
+                        print ("added c_newset")
         allsets.append(newsets)
         itemsets = (newsets)
     return allsets

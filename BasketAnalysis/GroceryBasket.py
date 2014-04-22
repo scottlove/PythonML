@@ -21,5 +21,5 @@ for elem in chain(*dataset):
 
 ap = a.apriori_simple(counts,80,dataset)
 
-print ap.count()
-print ap
+print (ap.count())
+print (ap)
